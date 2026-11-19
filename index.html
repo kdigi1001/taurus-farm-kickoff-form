@@ -97,6 +97,12 @@ textarea { min-height: 112px; resize: vertical; }
 .check { width: 72px; height: 72px; border-radius: 50%; background: var(--yellow); display: grid; place-items: center; margin: 4px 0 16px; box-shadow: 0 0 0 8px rgba(255,224,0,.28); }
 .check svg { width: 36px; height: 36px; stroke: var(--navy); }
 
+.card { scroll-margin-top: 20px; }
+.card.done { text-align: center; padding-top: 34px; }
+.card.done .check { margin: 0 auto 18px; }
+.card.done .intro { max-width: 34ch; margin-left: auto; margin-right: auto; }
+.card.done .nav { flex-direction: column; align-items: stretch; max-width: 360px; margin: 26px auto 4px; }
+.card.done .btn { width: 100%; }
 .foot { text-align: center; color: var(--muted); font-size: 14px; padding: 0 16px 36px; }
 .foot b { color: var(--navy); }
 
@@ -300,8 +306,13 @@ textarea { min-height: 112px; resize: vertical; }
     if (!ok) status.textContent = "Select the text above and copy it.";
   }
 
+  function focusCard() {
+    var c = document.querySelector(".card");
+    if (c && c.scrollIntoView) c.scrollIntoView({ block: "start" });
+  }
+
   function renderDone() {
-    var card = el("section", { class: "card" });
+    var card = el("section", { class: "card done" });
     if (state.mode === "sent") {
       var chk = el("div", { class: "check", "aria-hidden": "true" });
       chk.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -322,12 +333,12 @@ textarea { min-height: 112px; resize: vertical; }
       card.appendChild(status);
     }
     card.appendChild(el("div", { class: "nav" }, [
-      el("button", { type: "button", class: "btn ghost", text: "Edit my answers", onclick: function () { state.done = false; render(); } }),
       el("button", { type: "button", class: "btn", text: "Back to home", onclick: function () {
         state.answers = {}; state.message = ""; state.done = false;
         try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
         render(); window.scrollTo(0, 0);
-      } })
+      } }),
+      el("button", { type: "button", class: "btn ghost", text: "Edit my answers", onclick: function () { state.done = false; render(); focusCard(); } })
     ]));
     return card;
   }
@@ -358,7 +369,7 @@ textarea { min-height: 112px; resize: vertical; }
       state.mode = "copy";
       state.done = true;
       render();
-      window.scrollTo(0, 0);
+      focusCard();
       return;
     }
     state.busy = true;
@@ -376,7 +387,7 @@ textarea { min-height: 112px; resize: vertical; }
         state.done = true;
         try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
         render();
-        window.scrollTo(0, 0);
+        focusCard();
       })
       .catch(function () {
         state.busy = false;
