@@ -127,13 +127,13 @@ textarea { min-height: 112px; resize: vertical; }
   /* Paste your Google Apps Script Web app URL (ends in /exec) here. See README. */
   var ENDPOINT = "https://script.google.com/macros/s/AKfycbw9r-OcKXoN-0wmfW9pkLHHUvdQk8BfuKxXZMUD3COoi8jxA41NTXfMggPhmS-T08T8/exec";
 
-  var DRAFT_KEY = "taurus-kickoff-draft-v2";
+  var BUSINESS_NAME = "Taurus Farm Pickleball Court";
+  var DRAFT_KEY ="taurus-kickoff-draft-v2";
 
   var TITLE = "About Taurus Farm";
   var INTRO = "Fields marked * are required. Answer the rest as best you can. You can edit and send again later.";
 
   var FIELDS = [
-    { id: "business", label: "Business Name", type: "text", required: true },
     { id: "address", label: "Business Address", hint: "Street, barangay, city, and a nearby landmark.", type: "textarea", rows: 3, required: true },
     { id: "phone", label: "Business Contact Number", type: "tel", required: true },
     { id: "email", label: "Email Address", type: "email", required: true },
@@ -185,7 +185,7 @@ textarea { min-height: 112px; resize: vertical; }
   }
 
   function toText() {
-    var lines = ["Taurus Farm kickoff form", "Submitted: " + new Date().toISOString().slice(0, 10), ""];
+    var lines = ["Taurus Farm kickoff form", "Submitted: " + new Date().toISOString().slice(0, 10), "Business Name: " + BUSINESS_NAME, ""];
     FIELDS.forEach(function (f) {
       var v = getVal(f.id).trim();
       if (!v) { lines.push(f.label + ": Not answered"); return; }
@@ -263,12 +263,12 @@ textarea { min-height: 112px; resize: vertical; }
     card.appendChild(el("h2", { id: "title", tabindex: "-1", text: TITLE }));
     card.appendChild(el("p", { class: "intro", text: INTRO }));
     card.appendChild(el("div", { class: "progress", id: "prog" }, [
-      el("div", { class: "row" }, [el("span", { text: "Required details" }), el("span", { id: "prog-n", text: "0 of 4" })]),
+      el("div", { class: "row" }, [el("span", { text: "Required details" }), el("span", { id: "prog-n", text: "0 of 3" })]),
       el("div", { class: "bar", role: "presentation" }, [el("div", { class: "fill", id: "prog-f" })])
     ]));
     FIELDS.forEach(function (f, i) {
       if (i === 0) card.appendChild(el("div", { class: "section" }, [el("span", { class: "num", "aria-hidden": "true", text: "1" }), el("h3", { text: "Business information" })]));
-      if (i === 4) {
+      if (i === 3) {
         card.appendChild(el("hr", { class: "divider" }));
         card.appendChild(el("div", { class: "section" }, [el("span", { class: "num", "aria-hidden": "true", text: "2" }), el("h3", { text: "Offers and plans" })]));
       }
@@ -367,7 +367,7 @@ textarea { min-height: 112px; resize: vertical; }
     var payload = {
       submittedAt: new Date().toISOString(),
       website: "",
-      answers: JSON.parse(JSON.stringify(state.answers))
+      answers: Object.assign({}, JSON.parse(JSON.stringify(state.answers)), { business: BUSINESS_NAME })
     };
     fetch(ENDPOINT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
       .then(function () {
