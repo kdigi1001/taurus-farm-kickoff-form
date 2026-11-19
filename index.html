@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taurus Farm Kickoff Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Layout: one centered column. A brand strip and title, then a single card with the questions. */
+  --bg: #F2F6F5;
+  --surface: #FFFFFF;
+  --ink: #14302C;
+  --muted: #586C69;
+  --line: #CFD9D7;
+  --accent: #1F4E4A;
+  --accent-ink: #FFFFFF;
+  --soft: #E2EDEB;
+  --err: #B3261E;
+  --display: Georgia, "Times New Roman", serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1918;
+    --surface: #152624;
+    --ink: #E6EFED;
+    --muted: #9BB0AC;
+    --line: #2B403D;
+    --accent: #6FC3B8;
+    --accent-ink: #0B1F1D;
+    --soft: #1D3532;
+    --err: #FF8A80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1918;
+  --surface: #152624;
+  --ink: #E6EFED;
+  --muted: #9BB0AC;
+  --line: #2B403D;
+  --accent: #6FC3B8;
+  --accent-ink: #0B1F1D;
+  --soft: #1D3532;
+  --err: #FF8A80;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 680px; margin: 0 auto; padding: 24px 16px 72px; }
+.brand { display: flex; align-items: baseline; gap: 10px; font-family: var(--display); font-weight: 700; color: var(--accent); font-size: 18px; }
+.brand span { font-family: var(--body); font-weight: 500; font-size: 13px; color: var(--muted); }
+h1 { font-family: var(--display); font-size: clamp(26px, 6vw, 34px); line-height: 1.15; margin: 14px 0 8px; text-wrap: balance; }
+.lead { color: var(--muted); margin: 0 0 20px; max-width: 60ch; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 20px; }
+.card h2 { font-family: var(--display); font-size: 24px; margin: 0 0 4px; outline: none; text-wrap: balance; }
+.card .intro { color: var(--muted); margin: 0 0 20px; }
+.field { margin: 0 0 20px; }
+.field .lbl { display: block; font-weight: 600; font-size: 16px; margin: 0 0 4px; }
+.hint { color: var(--muted); font-size: 14px; margin: 0 0 8px; }
+input[type="text"], input[type="email"], input[type="tel"], textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+textarea { min-height: 96px; resize: vertical; }
+input:focus-visible, textarea:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.field.invalid input, .field.invalid textarea { border-color: var(--err); }
+.err { color: var(--err); font-size: 14px; margin: 6px 0 0; }
+.divider { border: 0; border-top: 1px solid var(--line); margin: 6px 0 22px; }
+.nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 22px; }
+.btn { font: inherit; font-weight: 600; font-size: 16px; padding: 12px 22px; border-radius: 10px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); cursor: pointer; min-height: 46px; }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn:disabled { opacity: .6; cursor: default; }
+.status { margin: 14px 0 0; font-size: 14px; color: var(--muted); }
+.status.bad { color: var(--err); }
+.copybox { width: 100%; min-height: 240px; font-size: 14px; }
+.foot { text-align: center; color: var(--muted); font-size: 13px; margin-top: 24px; }
+@media (max-width: 520px) { .card { padding: 18px 14px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">kath&acirc; <span>Ideas take form</span></div>
+  <h1>Taurus Farm kickoff form</h1>
+  <p class="lead">Tell us about Taurus Farm so we can set up your social pages and booking system. It takes a few minutes. This device keeps your draft if you need to leave and come back.</p>
+  <div id="app"></div>
+  <p class="foot">Prepared by Katha Digital</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* Paste your Google Apps Script Web app URL (ends in /exec) here. See README. */
+  var ENDPOINT = "";
+
+  var DRAFT_KEY = "taurus-kickoff-draft-v2";
+
+  var TITLE = "About Taurus Farm";
+  var INTRO = "Answer what you can. You can edit your answers and send them again later.";
+
+  var FIELDS = [
+    { id: "business", label: "Business Name", type: "text", required: true },
+    { id: "address", label: "Business Address", hint: "Street, barangay, city, and a nearby landmark.", type: "textarea", rows: 3, required: true },
+    { id: "phone", label: "Business Contact Number", type: "tel", required: true },
+    { id: "email", label: "Email Address", type: "email", required: true },
+    { id: "offers", label: "Business Offers", hint: "List what you offer and the price of each, such as court rental, Open Play, coaching, memberships and promos.", type: "textarea", rows: 6 },
+    { id: "projects", label: "Business Future Projects", hint: "Anything you plan to build or start, such as new courts or new services. Add roughly when.", type: "textarea", rows: 5 },
+    { id: "events", label: "Business Future Events", hint: "Tournaments, Open Play nights, launches or promos coming up, with dates if you have them.", type: "textarea", rows: 5 }
+  ];
+
+  var app = document.getElementById("app");
+  var state = { answers: {}, done: false, mode: "sent", busy: false, message: "" };
+  
+
+  /* ---------- helpers ---------- */
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        var v = attrs[k];
+        if (v === false || v === null || v === undefined) return;
+        if (k === "class") n.className = v;
+        else if (k === "text") n.textContent = v;
+        else if (k.slice(0, 2) === "on") n.addEventListener(k.slice(2), v);
+        else n.setAttribute(k, v);
+      });
+    }
+    (kids || []).forEach(function (c) {
+      if (c === null || c === undefined) return;
+      n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return n;
+  }
+
+  function getVal(id) {
+    var v = state.answers[id];
+    return v === undefined ? "" : String(v);
+  }
+
+  function saveDraft() {
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ answers: state.answers })); } catch (e) { /* storage may be unavailable */ }
+  }
+
+  function loadDraft() {
+    try {
+      var raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      var d = JSON.parse(raw);
+      if (d && d.answers && typeof d.answers === "object") state.answers = d.answers;
+    } catch (e) { /* ignore a broken draft */ }
+  }
+
+  function toText() {
+    var lines = ["Taurus Farm kickoff form", "Submitted: " + new Date().toISOString().slice(0, 10), ""];
+    FIELDS.forEach(function (f) {
+      var v = getVal(f.id).trim();
+      if (!v) { lines.push(f.label + ": Not answered"); return; }
+      lines.push(v.indexOf("\n") > -1 ? f.label + ":\n" + v : f.label + ": " + v);
+    });
+    return lines.join("\n");
+  }
+
+  /* ---------- validation ---------- */
+  function validate() {
+    var errs = [];
+    FIELDS.forEach(function (f) {
+      var v = getVal(f.id).trim();
+      if (f.required && !v) errs.push({ id: f.id, msg: "This answer is needed." });
+      else if (f.type === "email" && v && !/^\S+@\S+\.\S+$/.test(v)) errs.push({ id: f.id, msg: "Check the email address. It should look like name@example.com." });
+    });
+    return errs;
+  }
+
+  function showErrors(errs) {
+    var first = null;
+    errs.forEach(function (e) {
+      var wrap = app.querySelector('[data-id="' + e.id + '"]');
+      if (!wrap) return;
+      wrap.classList.add("invalid");
+      var p = wrap.querySelector(".err");
+      if (p) { p.textContent = e.msg; p.hidden = false; }
+      if (!first) first = wrap;
+    });
+    if (first) {
+      var c = first.querySelector("input, textarea");
+      if (c) c.focus();
+    }
+  }
+
+  /* ---------- rendering ---------- */
+  function renderField(f) {
+    var id = "f-" + f.id;
+    var wrap = el("div", { class: "field", "data-id": f.id });
+    wrap.appendChild(el("label", { class: "lbl", for: id, text: f.label }));
+    if (f.hint) wrap.appendChild(el("p", { class: "hint", id: id + "-hint", text: f.hint }));
+    var control = f.type === "textarea"
+      ? el("textarea", { id: id, rows: String(f.rows || 3) })
+      : el("input", { type: f.type, id: id, autocomplete: f.type === "email" ? "email" : (f.type === "tel" ? "tel" : "off") });
+    if (f.hint) control.setAttribute("aria-describedby", id + "-hint");
+    if (f.required) control.setAttribute("aria-required", "true");
+    control.value = getVal(f.id);
+    control.addEventListener("input", function () {
+      state.answers[f.id] = control.value;
+      wrap.classList.remove("invalid");
+      var p = wrap.querySelector(".err");
+      if (p) p.hidden = true;
+      saveDraft();
+    });
+    wrap.appendChild(control);
+    wrap.appendChild(el("p", { class: "err", role: "alert", hidden: "hidden" }));
+    return wrap;
+  }
+
+  function renderForm() {
+    var card = el("section", { class: "card" });
+    card.appendChild(el("h2", { id: "title", tabindex: "-1", text: TITLE }));
+    card.appendChild(el("p", { class: "intro", text: INTRO }));
+    FIELDS.forEach(function (f, i) {
+      if (i === 4) card.appendChild(el("hr", { class: "divider" }));
+      card.appendChild(renderField(f));
+    });
+    var canSend = !!ENDPOINT;
+    card.appendChild(el("div", { class: "nav" }, [
+      el("span"),
+      el("button", { type: "button", class: "btn", text: canSend ? "Send to katha" : "Get my answers to send", disabled: state.busy ? "disabled" : false, onclick: submit })
+    ]));
+    if (!canSend) card.appendChild(el("p", { class: "status", text: "Sending from this page is not available in this view. You will get your answers as text to copy and send to us." }));
+    if (state.message) card.appendChild(el("p", { class: "status bad", role: "alert", text: state.message }));
+    return card;
+  }
+
+  function copyAnswers(ta, status) {
+    var ok = false;
+    try {
+      ta.focus();
+      ta.select();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(
+          function () { status.textContent = "Copied."; },
+          function () { status.textContent = "Select the text above and copy it."; }
+        );
+        ok = true;
+      }
+    } catch (e) { ok = false; }
+    if (!ok) status.textContent = "Select the text above and copy it.";
+  }
+
+  function renderDone() {
+    var card = el("section", { class: "card" });
+    if (state.mode === "sent") {
+      card.appendChild(el("h2", { id: "title", tabindex: "-1", text: "Thank you" }));
+      card.appendChild(el("p", { class: "intro", text: "Your answers were sent to katha. If something changes, edit your answers and send them again." }));
+    } else {
+      card.appendChild(el("h2", { id: "title", tabindex: "-1", text: "Your answers" }));
+      card.appendChild(el("p", { class: "intro", text: "Copy this text and send it to katha. We will add it to your kickoff document." }));
+      var ta = el("textarea", { class: "copybox", readonly: "readonly", "aria-label": "Your answers as text" });
+      ta.value = toText();
+      var status = el("p", { class: "status", role: "status" });
+      card.appendChild(ta);
+      card.appendChild(el("div", { class: "nav" }, [
+        el("button", { type: "button", class: "btn", text: "Copy answers", onclick: function () { copyAnswers(ta, status); } }),
+        el("span")
+      ]));
+      card.appendChild(status);
+    }
+    card.appendChild(el("div", { class: "nav" }, [
+      el("button", { type: "button", class: "btn ghost", text: "Edit my answers", onclick: function () { state.done = false; render(); } }),
+      el("span")
+    ]));
+    return card;
+  }
+
+  function render(errs) {
+    app.textContent = "";
+    app.appendChild(state.done ? renderDone() : renderForm());
+    var t = document.getElementById("title");
+    if (t && !errs) t.focus({ preventScroll: true });
+    if (errs) showErrors(errs);
+  }
+
+  /* ---------- submit ---------- */
+  function submit() {
+    var errs = validate();
+    if (errs.length) { state.message = ""; render(errs); return; }
+    if (!ENDPOINT) {
+      state.mode = "copy";
+      state.done = true;
+      render();
+      window.scrollTo(0, 0);
+      return;
+    }
+    state.busy = true;
+    state.message = "";
+    render();
+    var payload = {
+      submittedAt: new Date().toISOString(),
+      website: "",
+      answers: JSON.parse(JSON.stringify(state.answers))
+    };
+    fetch(ENDPOINT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(function () {
+        state.busy = false;
+        state.mode = "sent";
+        state.done = true;
+        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+        render();
+        window.scrollTo(0, 0);
+      })
+      .catch(function () {
+        state.busy = false;
+        state.message = "We could not send your answers. Check your connection and try again, or copy them as text.";
+        render();
+      });
+  }
+
+  /* ---------- start ---------- */
+  loadDraft();
+  render();
+
+})();
+</script>
+</body>
+</html>
