@@ -275,7 +275,11 @@ textarea { min-height: 110px; resize: vertical; }
     }
     card.appendChild(el("div", { class: "nav" }, [
       el("button", { type: "button", class: "btn ghost", text: "Edit my answers", onclick: function () { state.done = false; render(); } }),
-      el("span")
+      el("button", { type: "button", class: "btn", text: "Back to home", onclick: function () {
+        state.answers = {}; state.message = ""; state.done = false;
+        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+        render(); window.scrollTo(0, 0);
+      } })
     ]));
     return card;
   }
